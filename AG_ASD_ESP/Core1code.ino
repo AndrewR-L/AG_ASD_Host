@@ -112,12 +112,14 @@ for(;;){
          switch (ASDBuffer[1]){
           case 0x00:                                  //Init Response
             if (ASDBuffer[2] == 0x03) {
+               // typically startByte, 0x00, 0x30, escMask,0x02, 0x08, 0x01, 0xF2 (CRC), stopByte
+               // ie same as request except ASDBuffer[1[ = 0x00 not 0x01
                gotInit = true;
                lastInitResponse = millis();
             }
             
             break;
-          case 0x55:                                  //Section Response
+          case 0x55:                                  //Section Response (but sometimes it is 0x54)
             if (ASDBuffer[2] == 0x01){
               //section Bytes = Pos 7,8,9,10  
               byte Pos = 6;
@@ -174,7 +176,7 @@ void ASD_Host_Init_Request(){
  byte crc = 0;
  byte Init[5] = {0x01, 0x03, 0x02, 0x08, 0x01};  
  // crc = 0x00 - (sum of bytes)
- crc = 0xFF - Init[1] - Init[2] -Init[3] -Init[4]; //only 4 bytes so as to omit 0x01?
+ crc = 0xFF - Init[1] - Init[2] -Init[3] -Init[4]; //assumes Init[0] = 0x01
 
  Serial1.write(startByte);
  for (int temp=0; temp<5; temp++){
@@ -395,15 +397,15 @@ void ASD_CalcRate(){
 //***********************************************************
 void ASD_Host_Init_Config(){
   byte crc = 0;
-  // crc = 0xfd - (sum of bytes)
-  crc = 0xFF - 0x25 - 0x02 - 0x02 - toolID[0] - toolID[1]; // why two more not one less than bytes sent?
+  // crc = 0x00 - (sum of bytes)
+  crc = 0xFF - 0x24 - 0x02 - 0x02 - toolID[0] - toolID[1]; // ??
  
   Serial1.write(startByte);
   Serial1.write(0x25);  
   Serial1.write(escMask);  
   Serial1.write(0x02);  
-  Serial1.write(escMask);  // why an escmask here, what happens if toolID[0] causes an escmask?
-  // missing write?
+  Serial1.write(escMask); 
+  Serial1.write(0x02); //missing writw 
   if (toolID[0] == startByte || toolID[0] == stopByte || toolID[0] == escMask) Serial1.write(escMask);
   Serial1.write(toolID[0]);
   if (toolID[1] == startByte || toolID[1] == stopByte || toolID[1] == escMask) Serial1.write(escMask);
@@ -412,14 +414,14 @@ void ASD_Host_Init_Config(){
   Serial1.write(stopByte);
 
   delay(50);
-  // crc = 0xfd - (sum of bytes)
-  crc = 0xFF - 0x35 - 0x02 - 0x02 - toolID[0] - toolID[1];
+  // crc = 0x00 - (sum of bytes)
+  crc = 0xFF - 0x34 - 0x02 - 0x02 - toolID[0] - toolID[1];
   Serial1.write(startByte);
   Serial1.write(0x35);  
   Serial1.write(escMask);  
   Serial1.write(0x02);  
   Serial1.write(escMask);  
-  // missing write?
+  Serial1.write(0x02);
   if (toolID[0] == startByte || toolID[0] == stopByte || toolID[0] == escMask) Serial1.write(escMask);
   Serial1.write(toolID[0]);
   if (toolID[1] == startByte || toolID[1] == stopByte || toolID[1] == escMask) Serial1.write(escMask);
