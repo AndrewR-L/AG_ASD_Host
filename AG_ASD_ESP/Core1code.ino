@@ -112,7 +112,7 @@ for(;;){
          switch (ASDBuffer[1]){
           case 0x00:                                  //Init Response
             if (ASDBuffer[2] == 0x03) {
-               // typically startByte, 0x00, 0x30, escMask,0x02, 0x08, 0x01, 0xF2 (CRC), stopByte
+               // typically startByte, 0x00, 0x03, escMask,0x02, 0x08, 0x01, 0xF2 (CRC), stopByte
                // ie same as request except ASDBuffer[1[ = 0x00 not 0x01
                gotInit = true;
                lastInitResponse = millis();
