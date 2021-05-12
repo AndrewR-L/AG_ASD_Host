@@ -193,7 +193,7 @@ void ASD_Host_Init_Request(){
 void ASD_Host_Rate_Request(){
   byte crc = 0;
   // Rate Request  startByte, 0x20, escMask, 0x02, 0x03,   0xXX,0x00,   0x00, 0xXX, stopByte;
-  //                Start     Rate?                        toolID       Rate! CRC   Stop
+  //                Start     Rate?               datalen  toolID       Rate! CRC   Stop
 
   // crc = 0x00 - (sum of bytes)
   crc= 0xFF - 0x24 - toolID[0] - toolID[1];
